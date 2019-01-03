@@ -3,6 +3,7 @@ package tm;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
@@ -12,10 +13,10 @@ public class PropertyMapping {
     private Model model;
     private Map<String, Property> maps;
 
-    public PropertyMapping(Model m) {
+    public PropertyMapping(Model m, double threshold) {
         this.model = m;
-        this.maps = this.extractProp();
-        computeFunctionalDegree(maps);
+        this.maps = filterFunctionalProps(this.extractProp(), threshold);
+
     }
 
     private Map<String, Property> extractProp() {
@@ -38,13 +39,20 @@ public class PropertyMapping {
         return m;
     }
 
-    private void computeFunctionalDegree(Map<String, Property> mp) {
+    private Map<String, Property> filterFunctionalProps(Map<String, Property> mp, double threshold) {
         Iterator it = mp.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
+            Map.Entry pair = (Map.Entry) it.next();
             Property prop = (Property) pair.getValue();
             prop.computeFunctionalDegree();
         }
+
+        Map<String, Property> maps = mp.entrySet()
+                .stream()
+                .filter(x -> x.getValue().getFunctionalDegree() > threshold)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return maps;
     }
 
     public Map<String, Property> getMaps() {

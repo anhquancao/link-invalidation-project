@@ -12,18 +12,22 @@ import java.util.Map;
 
 public class Detection {
 
-    public static final String dataPath = "/home/quan/dataset/";
+    private static final String DATA_PATH = "/home/quan/dataset/";
 
-    private void run(String dataPath) throws FileNotFoundException {
-        String path0 = dataPath + "data/000/onto.owl";
+    private static final double THRESHOLD = 0.9;
+
+    private void run() throws FileNotFoundException {
+        String path0 = DATA_PATH + "data/000/onto.owl";
         Model m0 = ModelFactory.createDefaultModel();
         m0.read(new FileInputStream(path0), "");
-        PropertyMapping p0 = new PropertyMapping(m0);
+        PropertyMapping p0 = new PropertyMapping(m0, THRESHOLD);
         Map<String, Property> map0 = p0.getMaps();
 
-        Iterator it = map0.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
+
+        System.out.println("Extracted " + map0.size() + " properties");
+
+        for (Object o : map0.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
             Property prop = (Property) pair.getValue();
             System.out.println(prop);
         }
@@ -42,7 +46,7 @@ public class Detection {
     public static void main(String[] args) {
         Detection detection = new Detection();
         try {
-            detection.run(dataPath);
+            detection.run();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
