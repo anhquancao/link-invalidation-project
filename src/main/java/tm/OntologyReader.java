@@ -18,7 +18,40 @@ public class OntologyReader {
 
     public OntologyReader(String path) throws FileNotFoundException {
         this.model = ModelFactory.createDefaultModel();
-        this.model.read(new FileInputStream(path), "");
+        this.model.read(path);
+    }
+
+    public Map<String, String> getSameAsIndividuals() {
+        String propEntity1 = "http://knowledgeweb.semanticweb.org/heterogeneity/alignment#entity1";
+        String propEntity2 = "http://knowledgeweb.semanticweb.org/heterogeneity/alignment#entity2";
+
+        String entity1 = null;
+        String entity2 = null;
+
+        StmtIterator itr = model.listStatements();
+        Map<String, String> m = new HashMap<>();
+        while (itr.hasNext()) {
+            Statement st = itr.nextStatement();
+
+            String sub = st.getSubject().toString();
+            String pred = st.getPredicate().toString();
+            String obj = st.getObject().toString();
+
+            if (pred.equalsIgnoreCase(propEntity1)) {
+                entity1 = obj;
+            }
+            if (pred.equalsIgnoreCase(propEntity2)) {
+                entity2 = obj;
+            }
+
+            if (entity1 != null && entity2 != null) {
+                m.put(entity1, entity2);
+                entity1 = null;
+                entity2 = null;
+            }
+
+        }
+        return m;
     }
 
     public Map<String, Property> getFunctionalProperties(double threshold) {
