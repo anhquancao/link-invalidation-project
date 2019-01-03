@@ -1,25 +1,34 @@
 package tm;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
-public class PropertyMapping {
+public class OntologyReader {
     private Model model;
-    private Map<String, Property> maps;
+    private Map<String, Property> properties = null;
 
-    public PropertyMapping(Model m, double threshold) {
-        this.model = m;
-        this.maps = filterFunctionalProps(this.extractProp(), threshold);
-
+    public OntologyReader(String path) throws FileNotFoundException {
+        this.model = ModelFactory.createDefaultModel();
+        this.model.read(new FileInputStream(path), "");
     }
 
-    private Map<String, Property> extractProp() {
+    public Map<String, Property> getFunctionalProperties(double threshold) {
+        if (this.properties == null) {
+            this.properties = this.getAllProperties();
+        }
+        return filterFunctionalProps(this.properties, threshold);
+    }
+
+    public Map<String, Property> getAllProperties() {
         StmtIterator itr = model.listStatements();
         Map<String, Property> m = new HashMap<>();
         while (itr.hasNext()) {
@@ -55,7 +64,4 @@ public class PropertyMapping {
         return maps;
     }
 
-    public Map<String, Property> getMaps() {
-        return maps;
-    }
 }
