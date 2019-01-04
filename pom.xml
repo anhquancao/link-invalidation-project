@@ -26,5 +26,12 @@
             <type>pom</type>
             <version>3.9.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.wcohen/com.wcohen.secondstring -->
+        <dependency>
+            <groupId>com.wcohen</groupId>
+            <artifactId>com.wcohen.secondstring</artifactId>
+            <version>0.1</version>
+        </dependency>
+
     </dependencies>
 </project>

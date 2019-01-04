@@ -1,4 +1,6 @@
+import com.wcohen.ss.JaroWinkler;
 import org.apache.jena.rdf.model.RDFNode;
+import tm.Standardier;
 import tm.MyProperty;
 import tm.OntologyReader;
 
@@ -13,6 +15,9 @@ public class Detection {
     private static final double THRESHOLD = 0.9;
 
     private void run() throws FileNotFoundException {
+
+        Standardier standardier = new Standardier();
+
         String path0 = DATA_PATH + "data/000/onto.owl";
         OntologyReader p0 = new OntologyReader(path0);
         Map<String, MyProperty> functionProperties = p0.getFunctionalProperties(THRESHOLD);
@@ -51,10 +56,16 @@ public class Detection {
                 List<RDFNode> l1 = p1.getPropertyValue(entity2, prop);
 
                 // If there are more than 1 value, we cannot decide
-                if (l0.size() == 1 && l1.size() == 1) {
+                if (l0.size() == 1 || l1.size() == 1) {
+                    String val0 = standardier.standardize(l0.get(0).toString(), prop);
+                    String val1 = standardier.standardize(l1.get(0).toString(), prop);
+
                     System.out.println("Property: " + prop);
-                    System.out.println("Property of entity 0" + l0);
-                    System.out.println("Property of entity 1" + l1);
+                    System.out.println("Property of entity 0: " + val0);
+                    System.out.println("Property of entity 1: " + val1);
+                    JaroWinkler jaroWinkler = new JaroWinkler();
+                    double distance = jaroWinkler.score(val0, val1);
+                    System.out.println("Distance: " + distance);
                 }
 
             }
