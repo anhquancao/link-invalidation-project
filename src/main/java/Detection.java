@@ -57,8 +57,11 @@ public class Detection {
 
                 // If there are more than 1 value, we cannot decide
                 if (l0.size() == 1 || l1.size() == 1) {
-                    String val0 = standardier.standardize(l0.get(0).toString(), prop);
-                    String val1 = standardier.standardize(l1.get(0).toString(), prop);
+                    RDFNode node0 = l0.get(0);
+                    RDFNode node1 = l1.get(0);
+
+                    String val0 = standardier.standardize(node0.toString(), prop);
+                    String val1 = standardier.standardize(node1.toString(), prop);
 
                     System.out.println("Property: " + prop);
                     System.out.println("Property of entity 0: " + val0);
