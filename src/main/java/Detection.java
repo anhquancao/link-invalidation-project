@@ -5,6 +5,7 @@ import tm.MyProperty;
 import tm.OntologyReader;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +45,9 @@ public class Detection {
             Map.Entry pair = (Map.Entry) o;
             String entity1 = (String) pair.getKey();
             String entity2 = (String) pair.getValue();
-            System.out.println("===============");
-            System.out.println("entity1: " + entity1);
-            System.out.println("entity2: " + entity2);
+//            System.out.println("===============");
+//            System.out.println("entity1: " + entity1);
+//            System.out.println("entity2: " + entity2);
 
             for (Object o1 : functionProperties.entrySet()) {
                 Map.Entry pair1 = (Map.Entry) o1;
@@ -60,15 +61,28 @@ public class Detection {
                     RDFNode node0 = l0.get(0);
                     RDFNode node1 = l1.get(0);
 
+
                     String val0 = standardier.standardize(node0.toString(), prop);
                     String val1 = standardier.standardize(node1.toString(), prop);
 
-                    System.out.println("Property: " + prop);
-                    System.out.println("Property of entity 0: " + val0);
-                    System.out.println("Property of entity 1: " + val1);
-                    JaroWinkler jaroWinkler = new JaroWinkler();
-                    double distance = jaroWinkler.score(val0, val1);
-                    System.out.println("Distance: " + distance);
+                    // We cannot decide if the value is not literal
+                    if (node0.isLiteral() && node1.isLiteral()) {
+
+                        JaroWinkler jaroWinkler = new JaroWinkler();
+                        double similarity = jaroWinkler.score(val0, val1);
+
+
+                        if (similarity < 0.7) {
+                            System.out.println("===============");
+                            System.out.println("Invalid sameAs: ");
+                            System.out.println("entity1: " + entity1);
+                            System.out.println("entity2: " + entity2);
+                            System.out.println("Property: " + prop);
+                            System.out.println("Property of entity 0: " + val0);
+                            System.out.println("Property of entity 1: " + val1);
+                            System.out.println("Similarity: " + similarity);
+                        }
+                    }
                 }
 
             }
