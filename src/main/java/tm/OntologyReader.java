@@ -4,10 +4,8 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import models.Pair;
 import org.apache.jena.rdf.model.*;
-import org.apache.jena.vocabulary.RDF;
-
-import javax.swing.plaf.nimbus.State;
 
 public class OntologyReader {
     private Model model;
@@ -46,7 +44,7 @@ public class OntologyReader {
      * Extract the sameAs objects
      * @return
      */
-    public Map<String, String> getSameAsIndividuals() {
+    public List<Pair> getSameAsIndividuals() {
         String propEntity1 = "http://knowledgeweb.semanticweb.org/heterogeneity/alignment#entity1";
         String propEntity2 = "http://knowledgeweb.semanticweb.org/heterogeneity/alignment#entity2";
 
@@ -54,7 +52,8 @@ public class OntologyReader {
         String entity2 = null;
 
         StmtIterator itr = model.listStatements();
-        Map<String, String> m = new HashMap<>();
+        List<Pair> pairs = new LinkedList<>();
+
         while (itr.hasNext()) {
             Statement st = itr.nextStatement();
 
@@ -70,13 +69,14 @@ public class OntologyReader {
             }
 
             if (entity1 != null && entity2 != null) {
-                m.put(entity1, entity2);
+                Pair pair = new Pair(entity1, entity2);
+                pairs.add(pair);
                 entity1 = null;
                 entity2 = null;
             }
 
         }
-        return m;
+        return pairs;
     }
 
     /**
