@@ -1,26 +1,51 @@
 package tm;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.vocabulary.RDF;
+
+import javax.swing.plaf.nimbus.State;
 
 public class OntologyReader {
     private Model model;
-    private Map<String, Property> properties = null;
+    private Map<String, MyProperty> properties = null;
 
     public OntologyReader(String path) throws FileNotFoundException {
         this.model = ModelFactory.createDefaultModel();
         this.model.read(path);
     }
 
+    /**
+     * Return a list of values wrt the subject and proeprty
+     * @param subject
+     * @param property
+     * @return
+     */
+    public List<RDFNode> getPropertyValue(String subject, String property) {
+        Resource resource = this.model.getResource(subject);
+        Property prop = this.model.getProperty(property);
+        Selector selector = new SimpleSelector(resource, prop, (Object) null);
+        StmtIterator iter = this.model.listStatements(selector);
+
+        List<RDFNode> lists = new LinkedList<>();
+
+        while (iter.hasNext()) {
+            Statement r = iter.nextStatement();
+            RDFNode obj = r.getObject();
+            lists.add(obj);
+        }
+
+        return lists;
+
+    }
+
+    /**
+     * Extract the sameAs objects
+     * @return
+     */
     public Map<String, String> getSameAsIndividuals() {
         String propEntity1 = "http://knowledgeweb.semanticweb.org/heterogeneity/alignment#entity1";
         String propEntity2 = "http://knowledgeweb.semanticweb.org/heterogeneity/alignment#entity2";
@@ -54,25 +79,30 @@ public class OntologyReader {
         return m;
     }
 
-    public Map<String, Property> getFunctionalProperties(double threshold) {
+    /**
+     * Get the functional properties base on the provided threshold
+     * @param threshold
+     * @return
+     */
+    public Map<String, MyProperty> getFunctionalProperties(double threshold) {
         if (this.properties == null) {
             this.properties = this.getAllProperties();
         }
         return filterFunctionalProps(this.properties, threshold);
     }
 
-    public Map<String, Property> getAllProperties() {
+    public Map<String, MyProperty> getAllProperties() {
         StmtIterator itr = model.listStatements();
-        Map<String, Property> m = new HashMap<>();
+        Map<String, MyProperty> m = new HashMap<>();
         while (itr.hasNext()) {
             Statement st = itr.nextStatement();
 
             String sub = st.getSubject().toString();
             String pred = st.getPredicate().toString();
 
-            Property prop = m.get(pred);
+            MyProperty prop = m.get(pred);
             if (prop == null) {
-                prop = new Property(pred);
+                prop = new MyProperty(pred);
                 m.put(pred, prop);
             }
             prop.addSubject(sub);
@@ -81,15 +111,15 @@ public class OntologyReader {
         return m;
     }
 
-    private Map<String, Property> filterFunctionalProps(Map<String, Property> mp, double threshold) {
+    private Map<String, MyProperty> filterFunctionalProps(Map<String, MyProperty> mp, double threshold) {
         Iterator it = mp.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            Property prop = (Property) pair.getValue();
+            MyProperty prop = (MyProperty) pair.getValue();
             prop.computeFunctionalDegree();
         }
 
-        Map<String, Property> maps = mp.entrySet()
+        Map<String, MyProperty> maps = mp.entrySet()
                 .stream()
                 .filter(x -> x.getValue().getFunctionalDegree() > threshold)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

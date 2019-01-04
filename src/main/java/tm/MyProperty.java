@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class Property {
+public class MyProperty {
     /**
      * is functional degree
      */
@@ -14,7 +14,7 @@ public class Property {
 
     private Map<String, Integer> subjectCount;
 
-    public Property(String name) {
+    public MyProperty(String name) {
         this.name = name;
         subjectCount = new HashMap<String, Integer>();
         functionalDegree = 0;
@@ -44,7 +44,7 @@ public class Property {
         return subjectCount;
     }
 
-    public Property(float functionalDegree) {
+    public MyProperty(float functionalDegree) {
         this.functionalDegree = functionalDegree;
     }
 
@@ -63,7 +63,7 @@ public class Property {
 
     @Override
     public String toString() {
-        return "Property{" +
+        return "MyProperty{" +
                 "functionalDegree=" + functionalDegree +
                 ", name='" + name + '\'' +
                 ", subjectCount=" + subjectCount +

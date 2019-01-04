@@ -1,7 +1,9 @@
-import tm.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import tm.MyProperty;
 import tm.OntologyReader;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Map;
 
 public class Detection {
@@ -11,15 +13,18 @@ public class Detection {
     private static final double THRESHOLD = 0.9;
 
     private void run() throws FileNotFoundException {
-//        String path0 = DATA_PATH + "data/000/onto.owl";
-//        OntologyReader p0 = new OntologyReader(path0);
-//        Map<String, Property> functionProperties = p0.getFunctionalProperties(THRESHOLD);
-//
+        String path0 = DATA_PATH + "data/000/onto.owl";
+        OntologyReader p0 = new OntologyReader(path0);
+        Map<String, MyProperty> functionProperties = p0.getFunctionalProperties(THRESHOLD);
+
+        String path1 = DATA_PATH + "data/001/onto.owl";
+        OntologyReader p1 = new OntologyReader(path1);
+
 //        System.out.println("Extracted " + functionProperties.size() + " function properties");
 //
 //        for (Object o : functionProperties.entrySet()) {
 //            Map.Entry pair = (Map.Entry) o;
-//            Property prop = (Property) pair.getValue();
+//            MyProperty prop = (MyProperty) pair.getValue();
 //            System.out.println(prop);
 //        }
 
@@ -35,8 +40,25 @@ public class Detection {
             String entity1 = (String) pair.getKey();
             String entity2 = (String) pair.getValue();
             System.out.println("===============");
-            System.out.println(entity1);
-            System.out.println(entity2);
+            System.out.println("entity1: " + entity1);
+            System.out.println("entity2: " + entity2);
+
+            for (Object o1 : functionProperties.entrySet()) {
+                Map.Entry pair1 = (Map.Entry) o1;
+                String prop = (String) pair1.getKey();
+
+                List<RDFNode> l0 = p0.getPropertyValue(entity1, prop);
+                List<RDFNode> l1 = p1.getPropertyValue(entity2, prop);
+
+                // If there are more than 1 value, we cannot decide
+                if (l0.size() == 1 && l1.size() == 1) {
+                    System.out.println("Property: " + prop);
+                    System.out.println("Property of entity 0" + l0);
+                    System.out.println("Property of entity 1" + l1);
+                }
+
+            }
+
         }
 
     }
