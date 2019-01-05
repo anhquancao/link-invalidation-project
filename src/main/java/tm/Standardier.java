@@ -23,14 +23,14 @@ public class Standardier {
         if (prop.equalsIgnoreCase(NAME_PROP)) {
             String filteredS = s.replace(".", "");
             String[] arr = filteredS.split("\\s");
-            String res = "";
+            StringBuilder res = new StringBuilder();
 
             for (int i = 0; i < arr.length - 1; i++) {
-                res = res + arr[i].substring(0, 1);
+                res.append(arr[i].substring(0, 1));
             }
-            res = res + arr[arr.length - 1];
+            res.append(arr[arr.length - 1]);
 
-            return res;
+            return res.toString();
 
         }
 
