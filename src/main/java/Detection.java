@@ -1,15 +1,12 @@
 import com.wcohen.ss.JaroWinkler;
 import models.Pair;
 import org.apache.jena.rdf.model.RDFNode;
-import tm.Standardier;
+import tm.Standardizer;
 import tm.MyProperty;
 import tm.OntologyReader;
 
-import java.util.regex.*;
-
 import java.io.FileNotFoundException;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +25,7 @@ public class Detection {
          * use dateFormats[0] for 001
          * use dateFormats[1] for 002
          */
-        Standardier standardier = new Standardier(dateFormats[1]);
+        Standardizer standardier = new Standardizer(dateFormats[1]);
 
 
         OntologyReader p0 = new OntologyReader(SRC_PATH);

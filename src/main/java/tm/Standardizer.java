@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Standardier {
+public class Standardizer {
 
 
     private static final String GENDER_PROP = "http://oaei.ontologymatching.org/2010/IIMBTBOX/gender";
@@ -15,7 +15,7 @@ public class Standardier {
     private static final String NAME_PROP = "http://oaei.ontologymatching.org/2010/IIMBTBOX/name";
     private String refDateFormat;
 
-    public Standardier(String refDateFormat) {
+    public Standardizer(String refDateFormat) {
         this.refDateFormat = refDateFormat;
     }
 
@@ -26,7 +26,7 @@ public class Standardier {
             StringBuilder res = new StringBuilder();
 
             for (int i = 0; i < arr.length - 1; i++) {
-                res.append(arr[i].substring(0, 1));
+                res.append(arr[i], 0, 1);
             }
             res.append(arr[arr.length - 1]);
 
