@@ -12,6 +12,7 @@ public class Standardier {
 
     private static final String GENDER_PROP = "http://oaei.ontologymatching.org/2010/IIMBTBOX/gender";
     private static final String DOB_PROP = "http://oaei.ontologymatching.org/2010/IIMBTBOX/date_of_birth";
+    private static final String NAME_PROP = "http://oaei.ontologymatching.org/2010/IIMBTBOX/name";
     private String refDateFormat;
 
     public Standardier(String refDateFormat) {
@@ -19,6 +20,20 @@ public class Standardier {
     }
 
     public String standardize(String s, String prop) {
+        if (prop.equalsIgnoreCase(NAME_PROP)) {
+            String filteredS = s.replace(".", "");
+            String[] arr = filteredS.split("\\s");
+            String res = "";
+
+            for (int i = 0; i < arr.length - 1; i++) {
+                res = res + arr[i].substring(0, 1);
+            }
+            res = res + arr[arr.length - 1];
+
+            return res;
+
+        }
+
         if (prop.equalsIgnoreCase(GENDER_PROP)) {
             if (s.equalsIgnoreCase("M") || s.equalsIgnoreCase("Male")) {
                 return "Male";

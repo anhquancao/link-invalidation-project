@@ -5,13 +5,17 @@ import tm.Standardier;
 import tm.MyProperty;
 import tm.OntologyReader;
 
+import java.util.regex.*;
+
 import java.io.FileNotFoundException;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class Detection {
 
-    String[] dateFormats = {"M/d/yy", "MMM d, yyyy"};
+    private String[] dateFormats = {"M/d/yy", "MMM d, yyyy"};
 
     private static final String SRC_PATH = "/home/quan/dataset/data/000/onto.owl";
     private static final String REF_PATH = "/home/quan/dataset/data/002/";
@@ -75,14 +79,18 @@ public class Detection {
                     String val0 = standardier.standardize(node0.toString(), prop);
                     String val1 = standardier.standardize(node1.toString(), prop);
 
+                    if (prop.equalsIgnoreCase("http://oaei.ontologymatching.org/2010/IIMBTBOX/name")) {
+                        int a = 2;
+                    }
+
+                    boolean flag = true;
                     // We cannot decide if the value is not literal
                     if (node0.isLiteral() && node1.isLiteral()) {
-
                         JaroWinkler jaroWinkler = new JaroWinkler();
                         double similarity = jaroWinkler.score(val0, val1);
 
-
                         if (similarity < 0.7) {
+
                             System.out.println("===============");
                             System.out.println("Invalid sameAs: ");
                             System.out.println("entity1: " + entity1);
@@ -91,6 +99,7 @@ public class Detection {
                             System.out.println("Property of entity 0: " + val0);
                             System.out.println("Property of entity 1: " + val1);
                             System.out.println("Similarity: " + similarity);
+
                         }
                     }
                 }
@@ -98,8 +107,8 @@ public class Detection {
             }
 
         }
-
     }
+
 
     public static void main(String[] args) {
         Detection detection = new Detection();
