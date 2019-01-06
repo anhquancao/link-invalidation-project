@@ -10,12 +10,12 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
-public class Detection {
+public class LogicalDetection {
 
     private String[] dateFormats = {"M/d/yy", "MMM d, yyyy"};
 
     private static final String SRC_PATH = "/home/quan/dataset/data/000/onto.owl";
-    private static final String REF_PATH = "/home/quan/dataset/data/002/";
+    private static final String REF_PATH = "/home/quan/dataset/data/001/";
 
     private static final double THRESHOLD = 0.9;
 
@@ -25,7 +25,7 @@ public class Detection {
          * use dateFormats[0] for 001
          * use dateFormats[1] for 002
          */
-        Standardizer standardier = new Standardizer(dateFormats[1]);
+        Standardizer standardier = new Standardizer(dateFormats[0]);
 
 
         OntologyReader p0 = new OntologyReader(SRC_PATH);
@@ -72,18 +72,13 @@ public class Detection {
 
 //                    System.out.println("Property: " + prop);
 
-
-                    String val0 = standardier.standardize(node0.toString(), prop);
-                    String val1 = standardier.standardize(node1.toString(), prop);
-
-                    if (prop.equalsIgnoreCase("http://oaei.ontologymatching.org/2010/IIMBTBOX/name")) {
-                        int a = 2;
-                    }
-
-                    boolean flag = true;
                     // We cannot decide if the value is not literal
                     if (node0.isLiteral() && node1.isLiteral()) {
+
                         JaroWinkler jaroWinkler = new JaroWinkler();
+                        String val0 = standardier.standardize(node0.asLiteral().getString(), prop);
+                        String val1 = standardier.standardize(node1.asLiteral().getString(), prop);
+
                         double similarity = jaroWinkler.score(val0, val1);
 
                         if (similarity < 0.7) {
@@ -108,7 +103,7 @@ public class Detection {
 
 
     public static void main(String[] args) {
-        Detection detection = new Detection();
+        LogicalDetection detection = new LogicalDetection();
         try {
             detection.run();
         } catch (FileNotFoundException e) {

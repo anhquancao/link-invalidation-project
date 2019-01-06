@@ -10,14 +10,19 @@ import org.apache.jena.rdf.model.*;
 public class OntologyReader {
     private Model model;
     private Map<String, MyProperty> properties = null;
+    private Set<String> blackList = new HashSet<>();
 
     public OntologyReader(String path) throws FileNotFoundException {
         this.model = ModelFactory.createDefaultModel();
         this.model.read(path);
+        blackList.add("http://oaei.ontologymatching.org/2010/IIMBTBOX/amount");
+        blackList.add("http://oaei.ontologymatching.org/2010/IIMBTBOX/calling_code");
+        blackList.add("http://oaei.ontologymatching.org/2010/IIMBTBOX/currency");
     }
 
     /**
      * Return a list of values wrt the subject and proeprty
+     *
      * @param subject
      * @param property
      * @return
@@ -42,6 +47,7 @@ public class OntologyReader {
 
     /**
      * Extract the sameAs objects
+     *
      * @return
      */
     public List<Pair> getSameAsIndividuals() {
@@ -81,6 +87,7 @@ public class OntologyReader {
 
     /**
      * Get the functional properties base on the provided threshold
+     *
      * @param threshold
      * @return
      */
@@ -100,12 +107,14 @@ public class OntologyReader {
             String sub = st.getSubject().toString();
             String pred = st.getPredicate().toString();
 
-            MyProperty prop = m.get(pred);
-            if (prop == null) {
-                prop = new MyProperty(pred);
-                m.put(pred, prop);
+            if (!blackList.contains(pred)) {
+                MyProperty prop = m.get(pred);
+                if (prop == null) {
+                    prop = new MyProperty(pred);
+                    m.put(pred, prop);
+                }
+                prop.addSubject(sub);
             }
-            prop.addSubject(sub);
         }
 
         return m;

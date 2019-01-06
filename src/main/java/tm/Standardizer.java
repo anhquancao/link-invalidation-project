@@ -20,16 +20,16 @@ public class Standardizer {
     }
 
     public String standardize(String s, String prop) {
+
         if (prop.equalsIgnoreCase(NAME_PROP)) {
-            String filteredS = s.replace(".", "");
-            String[] arr = filteredS.split("\\s");
+            String filteredS = s.replace(".", " ");
+            String[] arr = filteredS.split("\\s+");
             StringBuilder res = new StringBuilder();
 
             for (int i = 0; i < arr.length - 1; i++) {
                 res.append(arr[i], 0, 1);
             }
             res.append(arr[arr.length - 1]);
-
             return res.toString();
 
         }
