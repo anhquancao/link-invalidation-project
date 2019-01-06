@@ -15,6 +15,10 @@ public class LogicalDetection {
 
     private String[] dateFormats = {"M/d/yy", "MMM d, yyyy"};
 
+    /**
+     * 001 => ontologyNumber = 1
+     * 002 => ontologyNumber = 2
+     */
     private static final int ontologyNumber = 2;
 
     private static final String SRC_PATH = "/home/quan/dataset/data/000/onto.owl";
@@ -26,10 +30,7 @@ public class LogicalDetection {
 
     private void run() throws FileNotFoundException {
 
-        /**
-         * use dateFormats[0] for 001
-         * use dateFormats[1] for 002
-         */
+
         Standardizer standardier = new Standardizer(dateFormats[ontologyNumber - 1]);
 
 
