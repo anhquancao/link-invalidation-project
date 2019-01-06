@@ -1,5 +1,6 @@
 import com.wcohen.ss.JaroWinkler;
 import models.Pair;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import tm.Standardizer;
 import tm.MyProperty;
@@ -14,10 +15,14 @@ public class LogicalDetection {
 
     private String[] dateFormats = {"M/d/yy", "MMM d, yyyy"};
 
+    private static final int ontologyNumber = 2;
+
     private static final String SRC_PATH = "/home/quan/dataset/data/000/onto.owl";
-    private static final String REF_PATH = "/home/quan/dataset/data/001/";
+    private static final String REF_PATH = "/home/quan/dataset/data/00" + ontologyNumber + "/";
 
     private static final double THRESHOLD = 0.9;
+
+    private static final double SIM_THRESHOLD = 0.7;
 
     private void run() throws FileNotFoundException {
 
@@ -25,7 +30,7 @@ public class LogicalDetection {
          * use dateFormats[0] for 001
          * use dateFormats[1] for 002
          */
-        Standardizer standardier = new Standardizer(dateFormats[0]);
+        Standardizer standardier = new Standardizer(dateFormats[ontologyNumber - 1]);
 
 
         OntologyReader p0 = new OntologyReader(SRC_PATH);
@@ -72,24 +77,48 @@ public class LogicalDetection {
 
 //                    System.out.println("Property: " + prop);
 
+
                     // We cannot decide if the value is not literal
                     if (node0.isLiteral() && node1.isLiteral()) {
 
-                        JaroWinkler jaroWinkler = new JaroWinkler();
-                        String val0 = standardier.standardize(node0.asLiteral().getString(), prop);
-                        String val1 = standardier.standardize(node1.asLiteral().getString(), prop);
+                        Literal literal0 = node0.asLiteral();
+                        Literal literal1 = node1.asLiteral();
 
-                        double similarity = jaroWinkler.score(val0, val1);
+                        double similarity;
 
-                        if (similarity < 0.7) {
+                        if (literal0.getValue() instanceof String) {
+                            JaroWinkler jaroWinkler = new JaroWinkler();
+                            String val0 = standardier.standardize(literal0.getString(), prop);
+                            String val1 = standardier.standardize(literal1.getString(), prop);
+
+                            similarity = jaroWinkler.score(val0, val1);
+
+                            if (similarity < SIM_THRESHOLD) {
+                                System.out.println("Property of entity 0: " + val0);
+                                System.out.println("Property of entity 1: " + val1);
+                            }
+                        } else {
+                            double val0 = literal0.getDouble();
+                            double val1 = literal1.getDouble();
+
+                            similarity = val0 == val1 ? 1 : 0;
+
+                            if (similarity < SIM_THRESHOLD) {
+                                System.out.println("Property of entity 0: " + val0);
+                                System.out.println("Property of entity 1: " + val1);
+                            }
+
+                        }
+
+
+                        if (similarity < SIM_THRESHOLD) {
 
                             System.out.println("===============");
                             System.out.println("Invalid sameAs: ");
                             System.out.println("entity1: " + entity1);
                             System.out.println("entity2: " + entity2);
                             System.out.println("Property: " + prop);
-                            System.out.println("Property of entity 0: " + val0);
-                            System.out.println("Property of entity 1: " + val1);
+
                             System.out.println("Similarity: " + similarity);
 
                         }
