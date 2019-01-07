@@ -39,7 +39,7 @@ public class MLMain {
         System.out.println(data.size());
         System.out.println(data.get(0).getPropertyValues().size());
 
-        PrintWriter pw = new PrintWriter(new File("data.csv"));
+        PrintWriter pw = new PrintWriter(new File("data2.csv"));
         StringBuilder sb = new StringBuilder();
         for (Row r : data) {
             sb.append(r.toString());

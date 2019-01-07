@@ -5,7 +5,7 @@ public class Constant {
      * 001 => ontologyNumber = 1
      * 002 => ontologyNumber = 2
      */
-    public static final int ontologyNumber = 1;
+    public static final int ontologyNumber = 2;
 
     public static final String SRC_PATH = "/home/quan/dataset/data/000/onto.owl";
 
