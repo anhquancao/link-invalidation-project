@@ -17,8 +17,6 @@ import java.util.Map;
 
 public class LogicalDetector {
 
-    private String[] dateFormats = {"M/d/yy", "MMM d, yyyy"};
-
     public List<Pair> detect(
             List<Pair> individualsPairs,
             Map<String, PropertyWrapper> functionalProperties,
@@ -29,7 +27,7 @@ public class LogicalDetector {
 
         List<Pair> predictions = new LinkedList<>();
 
-        Standardizer standardier = new Standardizer(dateFormats[Constant.ontologyNumber - 1]);
+        Standardizer standardier = new Standardizer();
 
 
         for (Pair pair : individualsPairs) {

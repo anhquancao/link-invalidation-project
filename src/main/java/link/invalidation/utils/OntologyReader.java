@@ -11,14 +11,10 @@ import org.apache.jena.rdf.model.*;
 public class OntologyReader {
     private Model model;
     private Map<String, PropertyWrapper> properties = null;
-    private Set<String> blackList = new HashSet<>();
 
     public OntologyReader(String path) throws FileNotFoundException {
         this.model = ModelFactory.createDefaultModel();
         this.model.read(path);
-        blackList.add("http://oaei.ontologymatching.org/2010/IIMBTBOX/amount");
-        blackList.add("http://oaei.ontologymatching.org/2010/IIMBTBOX/calling_code");
-        blackList.add("http://oaei.ontologymatching.org/2010/IIMBTBOX/currency");
     }
 
     /**
@@ -64,7 +60,6 @@ public class OntologyReader {
         while (itr.hasNext()) {
             Statement st = itr.nextStatement();
 
-            String sub = st.getSubject().toString();
             String pred = st.getPredicate().toString();
             String obj = st.getObject().toString();
 
@@ -92,14 +87,14 @@ public class OntologyReader {
      * @param threshold
      * @return
      */
-    public Map<String, PropertyWrapper> getFunctionalProperties(double threshold) {
+    public Map<String, PropertyWrapper> getFunctionalProperties(double threshold, HashSet<String> blackList) {
         if (this.properties == null) {
-            this.properties = this.getAllProperties();
+            this.properties = this.getAllProperties(blackList);
         }
         return filterFunctionalProps(this.properties, threshold);
     }
 
-    public Map<String, PropertyWrapper> getAllProperties() {
+    public Map<String, PropertyWrapper> getAllProperties(HashSet<String> blackList) {
         StmtIterator itr = model.listStatements();
         Map<String, PropertyWrapper> m = new HashMap<>();
         while (itr.hasNext()) {
@@ -108,7 +103,7 @@ public class OntologyReader {
             String sub = st.getSubject().toString();
             String pred = st.getPredicate().toString();
 
-            if (!blackList.contains(pred)) {
+            if (blackList == null || !blackList.contains(pred)) {
                 PropertyWrapper prop = m.get(pred);
                 if (prop == null) {
                     prop = new PropertyWrapper(pred);

@@ -15,8 +15,8 @@ public class Standardizer {
     private static final String NAME_PROP = "http://oaei.ontologymatching.org/2010/IIMBTBOX/name";
     private String refDateFormat;
 
-    public Standardizer(String refDateFormat) {
-        this.refDateFormat = refDateFormat;
+    public Standardizer() {
+        this.refDateFormat = Constant.DATE_FORMATS[Constant.ontologyNumber - 1];
     }
 
     public String standardize(String s, String prop) {
@@ -66,8 +66,6 @@ public class Standardizer {
                 return s;
             }
             return resFormat.format(result);
-
-
         }
 
         return s;
