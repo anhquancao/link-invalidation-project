@@ -1,36 +1,33 @@
-package link.invalidation;
+package link.invalidation.detector;
 
 import com.wcohen.ss.JaroWinkler;
-import link.invalidation.models.MyProperty;
+import link.invalidation.models.PropertyWrapper;
 import link.invalidation.models.Pair;
+import link.invalidation.utils.Constant;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
-import link.invalidation.tm.Standardizer;
-import link.invalidation.tm.OntologyReader;
+import link.invalidation.utils.Standardizer;
+import link.invalidation.utils.OntologyReader;
 
 import java.io.FileNotFoundException;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class LogicalDetection {
+public class LogicalDetector {
 
     private String[] dateFormats = {"M/d/yy", "MMM d, yyyy"};
 
-    /**
-     * @param individualsPairs
-     * @param functionalProperties
-     * @param p0
-     * @param p1
-     * @throws FileNotFoundException
-     */
-    public void detect(
+    public List<Pair> detect(
             List<Pair> individualsPairs,
-            Map<String, MyProperty> functionalProperties,
+            Map<String, PropertyWrapper> functionalProperties,
             OntologyReader p0,
-            OntologyReader p1
+            OntologyReader p1,
+            boolean debug
     ) throws FileNotFoundException {
 
+        List<Pair> predictions = new LinkedList<>();
 
         Standardizer standardier = new Standardizer(dateFormats[Constant.ontologyNumber - 1]);
 
@@ -38,6 +35,8 @@ public class LogicalDetection {
         for (Pair pair : individualsPairs) {
             String entity1 = pair.getEntity1();
             String entity2 = pair.getEntity2();
+
+            boolean isValid = true;
 
             for (Object o1 : functionalProperties.entrySet()) {
                 Map.Entry pair1 = (Map.Entry) o1;
@@ -72,7 +71,7 @@ public class LogicalDetection {
 
                             similarity = jaroWinkler.score(val0, val1);
 
-                            if (similarity < Constant.SIM_THRESHOLD) {
+                            if (debug && similarity < Constant.SIM_THRESHOLD) {
                                 System.out.println("Property of entity 0: " + val0);
                                 System.out.println("Property of entity 1: " + val1);
                             }
@@ -82,30 +81,36 @@ public class LogicalDetection {
 
                             similarity = val0 == val1 ? 1 : 0;
 
-                            if (similarity < Constant.SIM_THRESHOLD) {
+                            if (debug && similarity < Constant.SIM_THRESHOLD) {
                                 System.out.println("Property of entity 0: " + val0);
                                 System.out.println("Property of entity 1: " + val1);
                             }
-
                         }
 
 
                         if (similarity < Constant.SIM_THRESHOLD) {
+                            if (debug) {
+                                System.out.println("===============");
+                                System.out.println("Invalid sameAs: ");
+                                System.out.println("entity1: " + entity1);
+                                System.out.println("entity2: " + entity2);
+                                System.out.println("Property: " + prop);
 
-                            System.out.println("===============");
-                            System.out.println("Invalid sameAs: ");
-                            System.out.println("entity1: " + entity1);
-                            System.out.println("entity2: " + entity2);
-                            System.out.println("Property: " + prop);
+                                System.out.println("Similarity: " + similarity);
+                            }
 
-                            System.out.println("Similarity: " + similarity);
-
+                            isValid = false;
                         }
                     }
                 }
 
             }
 
+            Pair newPair = new Pair(entity1, entity2);
+            newPair.setValid(isValid);
+            predictions.add(newPair);
         }
+
+        return predictions;
     }
 }

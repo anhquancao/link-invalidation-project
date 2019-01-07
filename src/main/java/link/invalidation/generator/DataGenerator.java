@@ -1,7 +1,8 @@
-package link.invalidation;
+package link.invalidation.generator;
 
 import link.invalidation.models.Pair;
-import link.invalidation.tm.OntologyReader;
+import link.invalidation.utils.Constant;
+import link.invalidation.utils.OntologyReader;
 
 import java.io.FileNotFoundException;
 import java.util.*;

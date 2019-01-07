@@ -1,16 +1,16 @@
-package link.invalidation.tm;
+package link.invalidation.utils;
 
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import link.invalidation.models.MyProperty;
+import link.invalidation.models.PropertyWrapper;
 import link.invalidation.models.Pair;
 import org.apache.jena.rdf.model.*;
 
 public class OntologyReader {
     private Model model;
-    private Map<String, MyProperty> properties = null;
+    private Map<String, PropertyWrapper> properties = null;
     private Set<String> blackList = new HashSet<>();
 
     public OntologyReader(String path) throws FileNotFoundException {
@@ -92,16 +92,16 @@ public class OntologyReader {
      * @param threshold
      * @return
      */
-    public Map<String, MyProperty> getFunctionalProperties(double threshold) {
+    public Map<String, PropertyWrapper> getFunctionalProperties(double threshold) {
         if (this.properties == null) {
             this.properties = this.getAllProperties();
         }
         return filterFunctionalProps(this.properties, threshold);
     }
 
-    public Map<String, MyProperty> getAllProperties() {
+    public Map<String, PropertyWrapper> getAllProperties() {
         StmtIterator itr = model.listStatements();
-        Map<String, MyProperty> m = new HashMap<>();
+        Map<String, PropertyWrapper> m = new HashMap<>();
         while (itr.hasNext()) {
             Statement st = itr.nextStatement();
 
@@ -109,9 +109,9 @@ public class OntologyReader {
             String pred = st.getPredicate().toString();
 
             if (!blackList.contains(pred)) {
-                MyProperty prop = m.get(pred);
+                PropertyWrapper prop = m.get(pred);
                 if (prop == null) {
-                    prop = new MyProperty(pred);
+                    prop = new PropertyWrapper(pred);
                     m.put(pred, prop);
                 }
                 prop.addSubject(sub);
@@ -121,15 +121,15 @@ public class OntologyReader {
         return m;
     }
 
-    private Map<String, MyProperty> filterFunctionalProps(Map<String, MyProperty> mp, double threshold) {
+    private Map<String, PropertyWrapper> filterFunctionalProps(Map<String, PropertyWrapper> mp, double threshold) {
         Iterator it = mp.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            MyProperty prop = (MyProperty) pair.getValue();
+            PropertyWrapper prop = (PropertyWrapper) pair.getValue();
             prop.computeFunctionalDegree();
         }
 
-        Map<String, MyProperty> maps = mp.entrySet()
+        Map<String, PropertyWrapper> maps = mp.entrySet()
                 .stream()
                 .filter(x -> x.getValue().getFunctionalDegree() > threshold)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

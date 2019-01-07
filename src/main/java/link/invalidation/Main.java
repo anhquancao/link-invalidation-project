@@ -1,8 +1,12 @@
 package link.invalidation;
 
-import link.invalidation.models.MyProperty;
+import link.invalidation.detector.LogicalDetector;
+import link.invalidation.generator.DataGenerator;
+import link.invalidation.metrics.Evaluator;
+import link.invalidation.models.PropertyWrapper;
 import link.invalidation.models.Pair;
-import link.invalidation.tm.OntologyReader;
+import link.invalidation.utils.Constant;
+import link.invalidation.utils.OntologyReader;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -11,7 +15,7 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         OntologyReader p0 = new OntologyReader(Constant.SRC_PATH);
-        Map<String, MyProperty> functionProperties = p0.getFunctionalProperties(Constant.THRESHOLD);
+        Map<String, PropertyWrapper> functionProperties = p0.getFunctionalProperties(Constant.THRESHOLD);
 
         String path1 = Constant.REF_PATH + "onto.owl";
         OntologyReader p1 = new OntologyReader(path1);
@@ -25,8 +29,15 @@ public class Main {
         // we will have a baseline of 50%
         List<Pair> pairs = generator.generateIncorrectPairs(correctPairs, correctPairs.size());
 
-        LogicalDetection logicalDetection = new LogicalDetection();
-        logicalDetection.detect(pairs, functionProperties, p0, p1);
+        LogicalDetector logicalDetection = new LogicalDetector();
+        List<Pair> predictions = logicalDetection.detect(pairs, functionProperties, p0, p1, false);
 
+        Evaluator evaluator = new Evaluator();
+        evaluator.evaluate(pairs, predictions);
+
+        System.out.println("Accuracy: " + evaluator.accuracy());
+        System.out.println("Precision: " + evaluator.precision());
+        System.out.println("Recall: " + evaluator.recall());
+        System.out.println("F1 score: " + evaluator.F1Score());
     }
 }

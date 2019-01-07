@@ -1,4 +1,4 @@
-package link.invalidation.tm;
+package link.invalidation.utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
