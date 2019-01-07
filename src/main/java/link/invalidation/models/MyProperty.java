@@ -1,4 +1,4 @@
-package tm;
+package link.invalidation.models;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,7 +20,7 @@ public class MyProperty {
         functionalDegree = 0;
     }
 
-    void computeFunctionalDegree() {
+    public void computeFunctionalDegree() {
         Iterator it = subjectCount.entrySet().iterator();
         float totalSubjects = 0;
         float uniqueSubjects = 0;
@@ -35,7 +35,7 @@ public class MyProperty {
         functionalDegree = uniqueSubjects / totalSubjects;
     }
 
-    void addSubject(String subject) {
+    public void addSubject(String subject) {
         Integer count = subjectCount.getOrDefault(subject, 0);
         subjectCount.put(subject, count + 1);
     }

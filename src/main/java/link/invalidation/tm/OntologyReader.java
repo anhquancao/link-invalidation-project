@@ -1,10 +1,11 @@
-package tm;
+package link.invalidation.tm;
 
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import models.Pair;
+import link.invalidation.models.MyProperty;
+import link.invalidation.models.Pair;
 import org.apache.jena.rdf.model.*;
 
 public class OntologyReader {

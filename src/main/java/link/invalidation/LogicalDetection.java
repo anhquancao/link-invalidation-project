@@ -1,10 +1,12 @@
+package link.invalidation;
+
 import com.wcohen.ss.JaroWinkler;
-import models.Pair;
+import link.invalidation.models.MyProperty;
+import link.invalidation.models.Pair;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
-import tm.Standardizer;
-import tm.MyProperty;
-import tm.OntologyReader;
+import link.invalidation.tm.Standardizer;
+import link.invalidation.tm.OntologyReader;
 
 import java.io.FileNotFoundException;
 
@@ -16,53 +18,28 @@ public class LogicalDetection {
     private String[] dateFormats = {"M/d/yy", "MMM d, yyyy"};
 
     /**
-     * 001 => ontologyNumber = 1
-     * 002 => ontologyNumber = 2
+     * @param individualsPairs
+     * @param functionalProperties
+     * @param p0
+     * @param p1
+     * @throws FileNotFoundException
      */
-    private static final int ontologyNumber = 2;
-
-    private static final String SRC_PATH = "/home/quan/dataset/data/000/onto.owl";
-    private static final String REF_PATH = "/home/quan/dataset/data/00" + ontologyNumber + "/";
-
-    private static final double THRESHOLD = 0.9;
-
-    private static final double SIM_THRESHOLD = 0.7;
-
-    private void run() throws FileNotFoundException {
+    public void detect(
+            List<Pair> individualsPairs,
+            Map<String, MyProperty> functionalProperties,
+            OntologyReader p0,
+            OntologyReader p1
+    ) throws FileNotFoundException {
 
 
-        Standardizer standardier = new Standardizer(dateFormats[ontologyNumber - 1]);
-
-
-        OntologyReader p0 = new OntologyReader(SRC_PATH);
-        Map<String, MyProperty> functionProperties = p0.getFunctionalProperties(THRESHOLD);
-
-        String path1 = REF_PATH + "onto.owl";
-        OntologyReader p1 = new OntologyReader(path1);
-
-//        System.out.println("Extracted " + functionProperties.size() + " function properties");
-//
-//        for (Object o : functionProperties.entrySet()) {
-//            Map.Entry pair = (Map.Entry) o;
-//            MyProperty prop = (MyProperty) pair.getValue();
-//            System.out.println(prop);
-//        }
-
-
-        // Extract sameAs individuals
-        String refalignPath = REF_PATH + "refalign.rdf";
-        OntologyReader refalignReader = new OntologyReader(refalignPath);
-        List<Pair> individualsPairs = refalignReader.getSameAsIndividuals();
+        Standardizer standardier = new Standardizer(dateFormats[Constant.ontologyNumber - 1]);
 
 
         for (Pair pair : individualsPairs) {
             String entity1 = pair.getEntity1();
             String entity2 = pair.getEntity2();
-//            System.out.println("===============");
-//            System.out.println("entity1: " + entity1);
-//            System.out.println("entity2: " + entity2);
 
-            for (Object o1 : functionProperties.entrySet()) {
+            for (Object o1 : functionalProperties.entrySet()) {
                 Map.Entry pair1 = (Map.Entry) o1;
                 String prop = (String) pair1.getKey();
 
@@ -88,13 +65,14 @@ public class LogicalDetection {
                         double similarity;
 
                         if (literal0.getValue() instanceof String) {
+                            // If the value is String, we use JaroWinkler
                             JaroWinkler jaroWinkler = new JaroWinkler();
                             String val0 = standardier.standardize(literal0.getString(), prop);
                             String val1 = standardier.standardize(literal1.getString(), prop);
 
                             similarity = jaroWinkler.score(val0, val1);
 
-                            if (similarity < SIM_THRESHOLD) {
+                            if (similarity < Constant.SIM_THRESHOLD) {
                                 System.out.println("Property of entity 0: " + val0);
                                 System.out.println("Property of entity 1: " + val1);
                             }
@@ -104,7 +82,7 @@ public class LogicalDetection {
 
                             similarity = val0 == val1 ? 1 : 0;
 
-                            if (similarity < SIM_THRESHOLD) {
+                            if (similarity < Constant.SIM_THRESHOLD) {
                                 System.out.println("Property of entity 0: " + val0);
                                 System.out.println("Property of entity 1: " + val1);
                             }
@@ -112,7 +90,7 @@ public class LogicalDetection {
                         }
 
 
-                        if (similarity < SIM_THRESHOLD) {
+                        if (similarity < Constant.SIM_THRESHOLD) {
 
                             System.out.println("===============");
                             System.out.println("Invalid sameAs: ");
@@ -128,16 +106,6 @@ public class LogicalDetection {
 
             }
 
-        }
-    }
-
-
-    public static void main(String[] args) {
-        LogicalDetection detection = new LogicalDetection();
-        try {
-            detection.run();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
     }
 }

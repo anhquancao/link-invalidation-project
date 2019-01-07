@@ -1,12 +1,22 @@
-package models;
+package link.invalidation.models;
 
 public class Pair {
     private String entity1;
     private String entity2;
+    private boolean isValid;
 
     public Pair(String left, String right) {
         this.entity1 = left;
         this.entity2 = right;
+        isValid = true;
+    }
+
+    public boolean isValid() {
+        return isValid;
+    }
+
+    public void setValid(boolean valid) {
+        isValid = valid;
     }
 
     public String getEntity1() {
