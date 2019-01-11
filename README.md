@@ -1,20 +1,15 @@
 # Information Integration
 
-## File Description
-- Property.java
-
-Property which is used in PropertyMapping.java
-
-- PropertyMapping.java
-
-
-- Detection.java
-TODO: Compare two maps of onto files with refalign file
-
-## External Requirement
-1. Dataset Folder: ../iimb_large_30082010/IIMB_LARGE/
 
 ## How to Get Started
 1. Import maven project 
 
-2. Run Detection.java
+2. Change the SRC_PATH and REF_PATH in link.invalidation.utils.Constant.java
+
+4. Add the secondstring-20120620.jar in the lib directory to the classpath
+
+5. Run link.invalidation.Main.java to run logical method
+
+6. Run link.invalidation.MLMain.java to generate the CSV data file for the machine learning.
+
+7. Run the LinkInvalidation.ipynb notebook to run the machine learning method
